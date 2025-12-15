@@ -1,10 +1,10 @@
+
 import {
   TextInput,
   Textarea,
   Select,
   Button,
   Group,
-  
   type ComboboxItem,
 } from '@mantine/core';
 import { useForm, Controller } from 'react-hook-form';
@@ -13,7 +13,7 @@ import { z } from 'zod';
 import type { Role } from '../types/role.type';
 import { useCreateRole, useUpdateRole } from '../hooks/useRoleTree';
 
-
+// Validation schema
 const roleSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
@@ -23,7 +23,7 @@ const roleSchema = z.object({
 type RoleFormValues = z.infer<typeof roleSchema>;
 
 interface RoleFormProps {
-  editingRole?: Role;
+  editingRole?: Role | null; // ✅ Allow null explicitly
   onCloseEdit?: () => void;
   allRoles: Role[];
 }
@@ -65,7 +65,7 @@ export const RoleForm = ({ editingRole, onCloseEdit, allRoles }: RoleFormProps) 
     }
   };
 
-  
+  // Prepare parent options for Select
   const parentOptions: ComboboxItem[] = [
     { value: 'null', label: 'None (Root)' },
     ...allRoles
@@ -105,7 +105,7 @@ export const RoleForm = ({ editingRole, onCloseEdit, allRoles }: RoleFormProps) 
       <Controller
         name="parentId"
         control={control}
-        render={({ field: { value, onChange, ...fieldRest } }) => (
+        render={({ field: { value, onChange } }) => (
           <Select
             label="Parent Role"
             placeholder="Select parent"
@@ -113,7 +113,6 @@ export const RoleForm = ({ editingRole, onCloseEdit, allRoles }: RoleFormProps) 
             value={value ?? 'null'}
             onChange={(val) => onChange(val === 'null' ? null : val)}
             mb="sm"
-            {...fieldRest}
           />
         )}
       />
