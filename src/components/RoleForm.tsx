@@ -23,7 +23,7 @@ const roleSchema = z.object({
 type RoleFormValues = z.infer<typeof roleSchema>;
 
 interface RoleFormProps {
-  editingRole?: Role | null; // ✅ Allow null explicitly
+  editingRole?: Role | null; 
   onCloseEdit?: () => void;
   allRoles: Role[];
 }
