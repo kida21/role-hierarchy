@@ -13,7 +13,7 @@ import { z } from 'zod';
 import type { Role } from '../types/role.type';
 import { useCreateRole, useUpdateRole } from '../hooks/useRoleTree';
 
-// Validation schema
+
 const roleSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
@@ -65,13 +65,21 @@ export const RoleForm = ({ editingRole, onCloseEdit, allRoles }: RoleFormProps) 
     }
   };
 
+  const validRoles = allRoles.filter(
+  (role): role is Role => 
+    typeof role.id === 'string' && 
+    role.id.trim() !== '' && 
+    typeof role.name === 'string' && 
+    role.name.trim() !== ''
+   );
   // Prepare parent options for Select
   const parentOptions: ComboboxItem[] = [
-    { value: 'null', label: 'None (Root)' },
-    ...allRoles
-      .filter((r) => r.id !== editingRole?.id) // prevent self as parent
-      .map((r) => ({ value: r.id, label: r.name })),
-  ];
+  { value: 'null', label: 'None (Root)' },
+  ...validRoles.map((r) => ({
+    value: r.id,     
+    label: r.name,    
+  })),
+];
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
