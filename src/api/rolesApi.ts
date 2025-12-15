@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { Role, RoleTreeNode } from '../types/role.type';
 
 const api = axios.create({
-  baseURL: '/api/v1/roles',
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 export const rolesApi = {
