@@ -1,4 +1,3 @@
-
 import {
   TextInput,
   Textarea,
@@ -13,7 +12,6 @@ import { z } from 'zod';
 import type { Role } from '../types/role.type';
 import { useCreateRole, useUpdateRole } from '../hooks/useRoleTree';
 
-
 const roleSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
@@ -23,12 +21,21 @@ const roleSchema = z.object({
 type RoleFormValues = z.infer<typeof roleSchema>;
 
 interface RoleFormProps {
-  editingRole?: Role | null; 
-  onCloseEdit?: () => void;
+  editingRole?: Role | null;
+  onCloseEdit: () => void;
   allRoles: Role[];
+  parentIdOverride?: string | null; // for "Add Child"
 }
 
-export const RoleForm = ({ editingRole, onCloseEdit, allRoles }: RoleFormProps) => {
+export const RoleForm = ({
+  editingRole,
+  onCloseEdit,
+  allRoles,
+  parentIdOverride,
+}: RoleFormProps) => {
+  const createMutation = useCreateRole();
+  const updateMutation = useUpdateRole();
+
   const {
     control,
     handleSubmit,
@@ -39,12 +46,9 @@ export const RoleForm = ({ editingRole, onCloseEdit, allRoles }: RoleFormProps) 
     defaultValues: {
       name: editingRole?.name || '',
       description: editingRole?.description || '',
-      parentId: editingRole?.parentId || null,
+      parentId: editingRole?.parentId || parentIdOverride || null,
     },
   });
-
-  const createMutation = useCreateRole();
-  const updateMutation = useUpdateRole();
 
   const onSubmit = (data: RoleFormValues) => {
     const payload = {
@@ -54,32 +58,25 @@ export const RoleForm = ({ editingRole, onCloseEdit, allRoles }: RoleFormProps) 
     };
 
     if (editingRole) {
-      updateMutation.mutate({ id: editingRole.id, data: payload });
-      onCloseEdit?.();
+      updateMutation.mutate({ id: editingRole.id, data: payload }, {
+        onSuccess: onCloseEdit,
+      });
     } else {
       createMutation.mutate(payload, {
         onSuccess: () => {
-          reset({ name: '', description: '', parentId: null });
+          reset({ name: '', description: '', parentId: parentIdOverride || null });
+          if (parentIdOverride) onCloseEdit(); // close after add child
         },
       });
     }
   };
 
-  const validRoles = allRoles.filter(
-  (role): role is Role => 
-    typeof role.id === 'string' && 
-    role.id.trim() !== '' && 
-    typeof role.name === 'string' && 
-    role.name.trim() !== ''
-   );
-  // Prepare parent options for Select
   const parentOptions: ComboboxItem[] = [
-  { value: 'null', label: 'None (Root)' },
-  ...validRoles.map((r) => ({
-    value: r.id,     
-    label: r.name,    
-  })),
-];
+    { value: 'null', label: 'None (Root)' },
+    ...allRoles
+      .filter(r => r.id !== editingRole?.id)
+      .map(r => ({ value: r.id, label: r.name })),
+  ];
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -103,7 +100,7 @@ export const RoleForm = ({ editingRole, onCloseEdit, allRoles }: RoleFormProps) 
         render={({ field }) => (
           <Textarea
             label="Description"
-            placeholder="Optional description"
+            placeholder="Optional"
             {...field}
             mb="sm"
           />
