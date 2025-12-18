@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
   TextInput,
   Textarea,
@@ -24,7 +25,7 @@ interface RoleFormProps {
   editingRole?: Role | null;
   onCloseEdit: () => void;
   allRoles: Role[];
-  parentIdOverride?: string | null; // for "Add Child"
+  parentIdOverride?: string | null;
 }
 
 export const RoleForm = ({
@@ -65,18 +66,30 @@ export const RoleForm = ({
       createMutation.mutate(payload, {
         onSuccess: () => {
           reset({ name: '', description: '', parentId: parentIdOverride || null });
-          if (parentIdOverride) onCloseEdit(); // close after add child
+          if (parentIdOverride) onCloseEdit();
         },
       });
     }
   };
 
+  // Build options for Select
   const parentOptions: ComboboxItem[] = [
     { value: 'null', label: 'None (Root)' },
     ...allRoles
       .filter(r => r.id !== editingRole?.id)
       .map(r => ({ value: r.id, label: r.name })),
   ];
+
+  
+  useEffect(() => {
+    if (parentIdOverride !== undefined) {
+      reset({
+        name: '',
+        description: '',
+        parentId: parentIdOverride || null,
+      });
+    }
+  }, [parentIdOverride, reset]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -86,7 +99,7 @@ export const RoleForm = ({
         render={({ field }) => (
           <TextInput
             label="Name"
-            placeholder="e.g. CEO"
+            placeholder="e.g. Project Manager"
             {...field}
             error={errors.name?.message}
             mb="sm"
@@ -100,7 +113,7 @@ export const RoleForm = ({
         render={({ field }) => (
           <Textarea
             label="Description"
-            placeholder="Optional"
+            placeholder="Optional details"
             {...field}
             mb="sm"
           />
@@ -110,14 +123,17 @@ export const RoleForm = ({
       <Controller
         name="parentId"
         control={control}
-        render={({ field: { value, onChange } }) => (
+        render={({ field: { value, onChange, ...fieldRest } }) => (
           <Select
             label="Parent Role"
-            placeholder="Select parent"
+            placeholder="Select or search parent"
             data={parentOptions}
             value={value ?? 'null'}
             onChange={(val) => onChange(val === 'null' ? null : val)}
+            searchable
+            nothingFoundMessage="No roles found"
             mb="sm"
+            {...fieldRest}
           />
         )}
       />

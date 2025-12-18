@@ -9,12 +9,18 @@ export const useRoleHierarchy = () => {
   });
 };
 
+
+const invalidateRoleQueries = (queryClient: ReturnType<typeof useQueryClient>) => {
+  queryClient.invalidateQueries({ queryKey: ['roleHierarchy'] });
+  queryClient.invalidateQueries({ queryKey: ['allRoles'] }); 
+};
+
 export const useCreateRole = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: Partial<Role>) => rolesApi.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['roleHierarchy'] });
+      invalidateRoleQueries(queryClient);
     },
   });
 };
@@ -25,7 +31,7 @@ export const useUpdateRole = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<Role> }) =>
       rolesApi.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['roleHierarchy'] });
+      invalidateRoleQueries(queryClient);
     },
   });
 };
@@ -35,7 +41,7 @@ export const useDeleteRole = () => {
   return useMutation({
     mutationFn: (id: string) => rolesApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['roleHierarchy'] });
+      invalidateRoleQueries(queryClient);
     },
   });
 };
