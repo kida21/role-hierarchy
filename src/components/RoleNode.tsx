@@ -1,33 +1,26 @@
-import { useState} from 'react';
+import { useState } from 'react';
 import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconPencil, IconTrash, IconPlus } from '@tabler/icons-react';
+import type { RoleTreeNode } from '../types/role.type';
 
 interface RoleNodeProps {
-  node: {
-    id: string;
-    name: string;
-    description?: string;
-    children: any[];
-  };
-  onEdit: (node: any) => void;
-  onDelete: (node: any) => void;
-  onAddChild: (parentId: string) => void;
+  node: RoleTreeNode;
+  onEdit: (node: RoleTreeNode) => void;
+  onDelete: (node: RoleTreeNode) => void;
+  onAddChild: (id: string, name: string) => void;
 }
 
 export const RoleNode = ({ node, onEdit, onDelete, onAddChild }: RoleNodeProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const hasChildren = node.children && node.children.length > 0;
+  const hasChildren = node.children.length > 0;
 
-  const toggle = () => {
-    if (hasChildren) setIsOpen(!isOpen);
-  };
+  const toggle = () => hasChildren && setIsOpen(!isOpen);
 
   return (
     <div className="flex flex-col items-center relative">
-      {/* Role Button */}
       <div
-        className="relative group cursor-pointer"
+        className="relative cursor-pointer"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={toggle}
@@ -36,9 +29,8 @@ export const RoleNode = ({ node, onEdit, onDelete, onAddChild }: RoleNodeProps) 
           <span className="text-sm font-medium text-gray-800">{node.name}</span>
         </div>
 
-        {/* Hover Action Icons */}
         {isHovered && (
-          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 flex gap-1 bg-white rounded p-1 shadow-md border">
+          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 flex gap-1 bg-white rounded p-1 shadow-md border z-10">
             <Tooltip label="Edit">
               <ActionIcon
                 size="sm"
@@ -59,7 +51,7 @@ export const RoleNode = ({ node, onEdit, onDelete, onAddChild }: RoleNodeProps) 
                 color="green"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onAddChild(node.id);
+                  onAddChild(node.id, node.name);
                 }}
               >
                 <IconPlus size={14} />
@@ -82,13 +74,12 @@ export const RoleNode = ({ node, onEdit, onDelete, onAddChild }: RoleNodeProps) 
         )}
       </div>
 
-      {/* Children */}
       {hasChildren && isOpen && (
         <>
           <div className="h-6 w-px bg-gray-400 my-1"></div>
           <div className="flex justify-center">
             <div className="flex gap-6">
-              {node.children.map((child: any) => (
+              {node.children.map(child => (
                 <div key={child.id} className="flex flex-col items-center">
                   <div className="h-6 w-px bg-gray-400"></div>
                   <RoleNode
@@ -104,7 +95,6 @@ export const RoleNode = ({ node, onEdit, onDelete, onAddChild }: RoleNodeProps) 
         </>
       )}
 
-      {/* Optional: Expand indicator if collapsed */}
       {hasChildren && !isOpen && (
         <button
           onClick={toggle}
