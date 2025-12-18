@@ -5,7 +5,7 @@ interface RoleTreeProps {
   tree: RoleTreeNode[];
   onEdit: (node: RoleTreeNode) => void;
   onDelete: (node: RoleTreeNode) => void;
-  onAddChild: (parentId: string) => void;
+  onAddChild: (id: string, name: string) => void;
 }
 
 export const RoleTree = ({ tree, onEdit, onDelete, onAddChild }: RoleTreeProps) => {
@@ -14,7 +14,7 @@ export const RoleTree = ({ tree, onEdit, onDelete, onAddChild }: RoleTreeProps) 
   }
 
   return (
-    <div className="flex justify-center py-6 overflow-x-auto">
+    <div className="flex justify-center py-6">
       <div className="flex gap-8">
         {tree.map(root => (
           <RoleNode
