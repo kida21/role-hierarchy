@@ -1,18 +1,31 @@
-import { Stack } from '@mantine/core';
-import type { RoleTreeNode } from '../types/role.type';
 import { RoleNode } from './RoleNode';
+import type { RoleTreeNode } from '../types/role.type';
 
 interface RoleTreeProps {
   tree: RoleTreeNode[];
-  onNodeClick: (node: RoleTreeNode) => void;
+  onEdit: (node: RoleTreeNode) => void;
+  onDelete: (node: RoleTreeNode) => void;
+  onAddChild: (parentId: string) => void;
 }
 
-export const RoleTree = ({ tree, onNodeClick }: RoleTreeProps) => {
+export const RoleTree = ({ tree, onEdit, onDelete, onAddChild }: RoleTreeProps) => {
+  if (tree.length === 0) {
+    return <div className="text-gray-500 text-center py-8">No roles defined.</div>;
+  }
+
   return (
-    <Stack gap="xs">
-      {tree.map(root => (
-        <RoleNode key={root.id} node={root} onClick={onNodeClick} />
-      ))}
-    </Stack>
+    <div className="flex justify-center py-6 overflow-x-auto">
+      <div className="flex gap-8">
+        {tree.map(root => (
+          <RoleNode
+            key={root.id}
+            node={root}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onAddChild={onAddChild}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
