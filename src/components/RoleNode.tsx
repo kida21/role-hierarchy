@@ -18,19 +18,34 @@ export const RoleNode = ({ node, onEdit, onDelete, onAddChild }: RoleNodeProps) 
   const toggle = () => hasChildren && setIsOpen(!isOpen);
 
   return (
-    <div className="flex flex-col items-center relative">
+    <div className="flex flex-col w-full">
+      {/* Node Row */}
       <div
-        className="relative cursor-pointer"
+        className="flex items-center py-1 px-2 rounded hover:bg-gray-100 relative group"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        onClick={toggle}
       >
-        <div className="w-32 h-32 bg-white border-2 border-blue-400 rounded-lg shadow flex items-center justify-center text-center p-2 hover:bg-blue-50 transition">
-          <span className="text-sm font-medium text-gray-800">{node.name}</span>
-        </div>
+        {/* Expand/Collapse Triangle */}
+        {hasChildren ? (
+          <button
+            onClick={toggle}
+            className="w-4 h-4 flex items-center justify-center text-gray-500 hover:text-gray-800 mr-1 focus:outline-none"
+            aria-label={isOpen ? 'Collapse' : 'Expand'}
+          >
+            {isOpen ? '▼' : '▶'}
+          </button>
+        ) : (
+          <span className="w-4 h-4 mr-1"></span> // Spacer for alignment
+        )}
 
+        {/* Role Name */}
+        <span className="text-sm font-medium text-gray-800 truncate">
+          {node.name}
+        </span>
+
+        {/* Action Icons (appear on hover, right-aligned) */}
         {isHovered && (
-          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 flex gap-1 bg-white rounded p-1 shadow-md border z-10">
+          <div className="absolute right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <Tooltip label="Edit">
               <ActionIcon
                 size="sm"
@@ -74,34 +89,19 @@ export const RoleNode = ({ node, onEdit, onDelete, onAddChild }: RoleNodeProps) 
         )}
       </div>
 
+      {/* Children */}
       {hasChildren && isOpen && (
-        <>
-          <div className="h-6 w-px bg-gray-400 my-1"></div>
-          <div className="flex justify-center">
-            <div className="flex gap-6">
-              {node.children.map(child => (
-                <div key={child.id} className="flex flex-col items-center">
-                  <div className="h-6 w-px bg-gray-400"></div>
-                  <RoleNode
-                    node={child}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                    onAddChild={onAddChild}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {hasChildren && !isOpen && (
-        <button
-          onClick={toggle}
-          className="mt-2 text-xs text-blue-600 hover:text-blue-800"
-        >
-          + Expand
-        </button>
+        <div className="ml-4 border-l-2 border-gray-200 pl-2 pt-1">
+          {node.children.map((child) => (
+            <RoleNode
+              key={child.id}
+              node={child}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onAddChild={onAddChild}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
