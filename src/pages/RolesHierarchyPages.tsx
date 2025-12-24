@@ -9,6 +9,7 @@ import {
   Text,
   Divider,
   Stack,
+  Box,
 } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { RoleForm } from '../components/RoleForm';
@@ -16,10 +17,13 @@ import { RoleTree } from '../components/RoleTree';
 import { useRoleHierarchy, useDeleteRole } from '../hooks/useRoleTree';
 import { rolesApi } from '../api/rolesApi';
 import type { Role, RoleTreeNode } from '../types/role.type';
+import { useAuth } from '../hooks/useAuth'; 
 
 type ModalType = 'edit' | 'delete' | 'addChild' | null;
 
 export const RoleHierarchyPage = () => {
+  const { logout } = useAuth(); 
+
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [roleToDelete, setRoleToDelete] = useState<{ id: string; name: string } | null>(null);
@@ -77,7 +81,13 @@ export const RoleHierarchyPage = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <Title order={2} mb="lg">Organization Role Hierarchy</Title>
+      {/* Header with Title and Logout */}
+      <Box className="flex justify-between items-center mb-6">
+        <Title order={2}>Organization Role Hierarchy</Title>
+        <Button variant="outline" size="sm" onClick={logout}>
+          Logout
+        </Button>
+      </Box>
 
       <Grid>
         <Grid.Col span={{ base: 12, md: 5 }}>
