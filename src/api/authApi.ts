@@ -9,3 +9,4 @@ const authApi = axios.create({
 export const login = (email: string, password: string) =>
   authApi.post('/login', { email, password });
 
+export const getCurrentUser = () => authApi.get('/me');
