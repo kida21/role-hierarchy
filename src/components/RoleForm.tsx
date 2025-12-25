@@ -72,7 +72,6 @@ export const RoleForm = ({
     }
   };
 
-  // Build options for Select
   const parentOptions: ComboboxItem[] = [
     { value: 'null', label: 'None (Root)' },
     ...allRoles
@@ -80,7 +79,6 @@ export const RoleForm = ({
       .map(r => ({ value: r.id, label: r.name })),
   ];
 
-  
   useEffect(() => {
     if (parentIdOverride !== undefined) {
       reset({
@@ -99,10 +97,12 @@ export const RoleForm = ({
         render={({ field }) => (
           <TextInput
             label="Name"
-            placeholder="e.g. Project Manager"
+            placeholder="e.g. CEO"
             {...field}
             error={errors.name?.message}
             mb="sm"
+            // Remove any right section icon
+            rightSection={null}
           />
         )}
       />
@@ -113,9 +113,10 @@ export const RoleForm = ({
         render={({ field }) => (
           <Textarea
             label="Description"
-            placeholder="Optional details"
+            placeholder="Optional"
             {...field}
             mb="sm"
+            rightSection={null}
           />
         )}
       />
@@ -123,7 +124,7 @@ export const RoleForm = ({
       <Controller
         name="parentId"
         control={control}
-        render={({ field: { value, onChange, ...fieldRest } }) => (
+        render={({ field: { value, onChange } }) => (
           <Select
             label="Parent Role"
             placeholder="Select or search parent"
@@ -133,7 +134,7 @@ export const RoleForm = ({
             searchable
             nothingFoundMessage="No roles found"
             mb="sm"
-            {...fieldRest}
+            rightSection={null}
           />
         )}
       />

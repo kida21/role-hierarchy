@@ -17,12 +17,12 @@ import { RoleTree } from '../components/RoleTree';
 import { useRoleHierarchy, useDeleteRole } from '../hooks/useRoleTree';
 import { rolesApi } from '../api/rolesApi';
 import type { Role, RoleTreeNode } from '../types/role.type';
-import { useAuth } from '../hooks/useAuth'; 
+import { useAuth } from '../hooks/useAuth';
 
 type ModalType = 'edit' | 'delete' | 'addChild' | null;
 
 export const RoleHierarchyPage = () => {
-  const { logout } = useAuth(); 
+  const { logout } = useAuth();
 
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -45,9 +45,13 @@ export const RoleHierarchyPage = () => {
   const deleteMutation = useDeleteRole();
 
   const handleEdit = async (node: RoleTreeNode) => {
-    const res = await rolesApi.getById(node.id);
-    setSelectedRole(res.data);
-    setActiveModal('edit');
+    try {
+      const res = await rolesApi.getById(node.id);
+      setSelectedRole(res.data);
+      setActiveModal('edit');
+    } catch (err) {
+      console.error('Failed to fetch role for editing:', err);
+    }
   };
 
   const handleDelete = (node: RoleTreeNode) => {
@@ -81,7 +85,6 @@ export const RoleHierarchyPage = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      {/* Header with Title and Logout */}
       <Box className="flex justify-between items-center mb-6">
         <Title order={2}>Organization Role Hierarchy</Title>
         <Button variant="outline" size="sm" onClick={logout}>
@@ -108,7 +111,7 @@ export const RoleHierarchyPage = () => {
                 tree={tree}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                onAddChild={handleAddChild}
+                onAddChild={handleAddChild} 
               />
             </div>
           </Card>
@@ -159,7 +162,7 @@ export const RoleHierarchyPage = () => {
         )}
       </Modal>
 
-      {/* Delete Modal */}
+      {/* Delete Confirmation Modal */}
       <Modal
         opened={activeModal === 'delete'}
         onClose={closeModal}
