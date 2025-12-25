@@ -9,29 +9,32 @@ export const useRoleHierarchy = () => {
   });
 };
 
-
-const invalidateRoleQueries = (queryClient: ReturnType<typeof useQueryClient>) => {
-  queryClient.invalidateQueries({ queryKey: ['roleHierarchy'] });
-  queryClient.invalidateQueries({ queryKey: ['allRoles'] }); 
-};
-
 export const useCreateRole = () => {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: Partial<Role>) => rolesApi.create(data),
+  return useMutation<
+    Role,
+    Error & { response?: { data?: { message?: string; statusCode: number } } },
+    Partial<Role>
+  >({
+    mutationFn: (data) => rolesApi.create(data).then(res => res.data),
     onSuccess: () => {
-      invalidateRoleQueries(queryClient);
+      queryClient.invalidateQueries({ queryKey: ['roleHierarchy'] });
+      queryClient.invalidateQueries({ queryKey: ['allRoles'] });
     },
   });
 };
 
 export const useUpdateRole = () => {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Role> }) =>
-      rolesApi.update(id, data),
+  return useMutation<
+    Role,
+    Error & { response?: { data?: { message?: string; statusCode: number } } },
+    { id: string; data: Partial<Role> }
+  >({
+    mutationFn: ({ id, data }) => rolesApi.update(id, data).then(res => res.data),
     onSuccess: () => {
-      invalidateRoleQueries(queryClient);
+      queryClient.invalidateQueries({ queryKey: ['roleHierarchy'] });
+      queryClient.invalidateQueries({ queryKey: ['allRoles'] });
     },
   });
 };
@@ -39,9 +42,10 @@ export const useUpdateRole = () => {
 export const useDeleteRole = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => rolesApi.delete(id),
+    mutationFn: (id: string) => rolesApi.delete(id).then(res => res.data),
     onSuccess: () => {
-      invalidateRoleQueries(queryClient);
+      queryClient.invalidateQueries({ queryKey: ['roleHierarchy'] });
+      queryClient.invalidateQueries({ queryKey: ['allRoles'] });
     },
   });
 };

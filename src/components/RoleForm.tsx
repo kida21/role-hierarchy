@@ -42,6 +42,8 @@ export const RoleForm = ({
     handleSubmit,
     reset,
     formState: { errors },
+    setError,
+    clearErrors,
   } = useForm<RoleFormValues>({
     resolver: zodResolver(roleSchema),
     defaultValues: {
@@ -58,16 +60,30 @@ export const RoleForm = ({
       parentId: data.parentId === 'null' ? null : data.parentId || null,
     };
 
+    const handleError = (error: any) => {
+      const message = error.response?.data?.message;
+      if (message) {
+        setError('name', { message });
+      } else {
+        setError('name', { message: 'An error occurred. Please try again.' });
+      }
+    };
+
     if (editingRole) {
-      updateMutation.mutate({ id: editingRole.id, data: payload }, {
-        onSuccess: onCloseEdit,
-      });
+      updateMutation.mutate(
+        { id: editingRole.id, data: payload },
+        {
+          onSuccess: onCloseEdit,
+          onError: handleError,
+        }
+      );
     } else {
       createMutation.mutate(payload, {
         onSuccess: () => {
           reset({ name: '', description: '', parentId: parentIdOverride || null });
           if (parentIdOverride) onCloseEdit();
         },
+        onError: handleError,
       });
     }
   };
@@ -99,9 +115,15 @@ export const RoleForm = ({
             label="Name"
             placeholder="e.g. CEO"
             {...field}
+            onChange={(e) => {
+              field.onChange(e);
+              // Clear validation error when user types
+              if (errors.name) {
+                clearErrors('name');
+              }
+            }}
             error={errors.name?.message}
             mb="sm"
-            // Remove any right section icon
             rightSection={null}
           />
         )}
