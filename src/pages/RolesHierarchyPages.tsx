@@ -22,7 +22,7 @@ import { useAuth } from '../hooks/useAuth';
 type ModalType = 'edit' | 'delete' | 'addChild' | null;
 
 export const RoleHierarchyPage = () => {
-  const { logout } = useAuth();
+  const { logout,isLoggingOut } = useAuth();
 
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -87,7 +87,7 @@ export const RoleHierarchyPage = () => {
     <div className="p-6 max-w-6xl mx-auto">
       <Box className="flex justify-between items-center mb-6">
         <Title order={2}>Organization Role Hierarchy</Title>
-        <Button variant="outline" size="sm" onClick={logout}>
+        <Button variant="outline" size="sm" onClick={()=>logout()} loading={isLoggingOut}>
           Logout
         </Button>
       </Box>
@@ -173,7 +173,7 @@ export const RoleHierarchyPage = () => {
           {roleToDelete && (
             <Text>
               Delete role <strong>"{roleToDelete.name}"</strong>?<br />
-              Its children will be moved up one level.
+              Its children will be deleted also if there any.
             </Text>
           )}
         </Stack>
