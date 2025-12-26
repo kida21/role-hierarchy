@@ -22,7 +22,7 @@ import { useAuth } from '../hooks/useAuth';
 type ModalType = 'edit' | 'delete' | 'addChild' | null;
 
 export const RoleHierarchyPage = () => {
-  const { logout,isLoggingOut } = useAuth();
+  const { user, logout } = useAuth();
 
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -30,12 +30,12 @@ export const RoleHierarchyPage = () => {
   const [addChildTo, setAddChildTo] = useState<{ id: string; name: string } | null>(null);
 
   const {
-    data: tree = [],
+     data:tree = [],
     isLoading: loadingTree,
   } = useRoleHierarchy();
 
   const {
-    data: allRoles = [],
+     data:allRoles = [],
     isLoading: loadingAll,
   } = useQuery<Role[]>({
     queryKey: ['allRoles'],
@@ -85,11 +85,25 @@ export const RoleHierarchyPage = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <Box className="flex justify-between items-center mb-6">
+      {/* Header: Title + Email and Logout */}
+      <Box className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <Title order={2}>Organization Role Hierarchy</Title>
-        <Button variant="outline" size="sm" onClick={()=>logout()} loading={isLoggingOut}>
-          Logout
-        </Button>
+        
+        <Group gap="xs" className="flex-wrap justify-end">
+          {user?.email && (
+            <Text size="sm" className="text-gray-700 font-medium">
+             {user.email}
+            </Text>
+          )}
+          <Button
+            onClick={() => logout()}
+            variant="outline"
+            size="sm"
+            className="border-gray-300 text-gray-700 hover:bg-gray-50"
+          >
+            Logout
+          </Button>
+        </Group>
       </Box>
 
       <Grid>
@@ -111,14 +125,14 @@ export const RoleHierarchyPage = () => {
                 tree={tree}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                onAddChild={handleAddChild} 
+                onAddChild={handleAddChild}
               />
             </div>
           </Card>
         </Grid.Col>
       </Grid>
 
-      {/* Edit Modal */}
+      {/* Modals */}
       <Modal opened={activeModal === 'edit'} onClose={closeModal} title="Edit Role" size="lg">
         {selectedRole && (
           <RoleForm
@@ -145,7 +159,6 @@ export const RoleHierarchyPage = () => {
         </Group>
       </Modal>
 
-      {/* Add Child Modal */}
       <Modal
         opened={activeModal === 'addChild'}
         onClose={closeModal}
@@ -162,7 +175,6 @@ export const RoleHierarchyPage = () => {
         )}
       </Modal>
 
-      {/* Delete Confirmation Modal */}
       <Modal
         opened={activeModal === 'delete'}
         onClose={closeModal}
@@ -173,7 +185,7 @@ export const RoleHierarchyPage = () => {
           {roleToDelete && (
             <Text>
               Delete role <strong>"{roleToDelete.name}"</strong>?<br />
-              Its children will be deleted also if there any.
+              Its children will be moved up one level.
             </Text>
           )}
         </Stack>

@@ -11,4 +11,4 @@ export const login = (email: string, password: string) =>
 
 export const logout = ()=> authApi.post('/logout')
 
-export const getCurrentUser = () => authApi.get('/me');
+export const getCurrentUser = () => authApi.get('/me').then(res => res.data);
