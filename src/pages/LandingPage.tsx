@@ -17,7 +17,6 @@ export const LandingPage = () => {
           </Title>
           <Text size="lg" className="text-gray-600 max-w-2xl mx-auto">
             Build, manage, and visualize your company's hierarchical structure with ease. 
-            Collaborate seamlessly across teams with real-time updates.
           </Text>
         </div>
 
