@@ -16,7 +16,7 @@ export const LandingPage = () => {
             Organization Role Manager
           </Title>
           <Text size="lg" className="text-gray-600 max-w-2xl mx-auto">
-            Build, manage, and visualize your company's hierarchical structure with ease. 
+            Build, manage, and visualize your company's hierarchical structure with Ease. 
           </Text>
         </div>
 
